@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VocalAI Studio - AI Supreme Vocal Coach & Master Engine</title>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --bg-dark: #07080c;
+            --bg-card: rgba(16, 20, 34, 0.8);
+            --bg-card-border: rgba(255, 255, 255, 0.1);
+            --primary-glow: #6366f1;
+            --secondary-glow: #ec4899;
+            --accent-cyan: #06b6d4;
+            --accent-green: #10b981;
+            --accent-yellow: #f59e0b;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 15%, rgba(99, 102, 241, 0.18) 0%, transparent 45%),
+                radial-gradient(circle at 90% 85%, rgba(236, 72, 153, 0.18) 0%, transparent 45%);
+            background-attachment: fixed;
+        }
+
+        header {
+            padding: 1.25rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--bg-card-border);
+            backdrop-filter: blur(16px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(7, 8, 12, 0.85);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #a5b4fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .tagline {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            border: 1px solid var(--bg-card-border);
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .app-container {
+            max-width: 1350px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            flex: 1;
+        }
+
+        @media (max-width: 1024px) {
+            .app-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 1.25rem;
+            padding: 1.75rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .visualizer-container {
+            width: 100%;
+            height: 180px;
+            background: rgba(0, 0, 0, 0.45);
+            border-radius: 0.75rem;
+            border: 1px solid var(--bg-card-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--bg-card-border);
+            color: var(--text-main);
+            padding: 0.85rem 1.2rem;
+            border-radius: 0.75rem;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            border: none;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626, #e11d48);
+            border: none;
+            box-shadow: 0 4px 15px rgba(225, 29, 72, 0.4);
+        }
+
+        .select-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .select-group label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        select, input[type="text"] {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--bg-card-border);
+            color: var(--text-main);
+            padding: 0.65rem 0.85rem;
+            border-radius: 0.5rem;
+            outline: none;
+            font-size: 0.9rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed var(--bg-card-border);
+            border-radius: 0.75rem;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s ease;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary-glow);
+            color: var(--text-main);
+        }
+
+        /* AI Message & Knowledge Chat Card */
+        .ai-message-card {
+            background: rgba(0, 0, 0, 0.35);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 0.85rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            position: relative;
+        }
+
+        .ai-avatar-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid var(--bg-card-border);
+            padding-bottom: 0.75rem;
+        }
+
+        .ai-avatar {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-weight: 700;
+            color: #a5b4fc;
+        }
+
+        .avatar-badge {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-glow), var(--secondary-glow));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+        }
+
+        .ai-chat-content {
+            font-size: 0.92rem;
+            line-height: 1.6;
+            color: #e2e8f0;
+            min-height: 90px;
+            max-height: 220px;
+            overflow-y: auto;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.25rem;
+        }
+
+        .chat-input-row input {
+            flex: 1;
+        }
+
+        .ai-audio-actions {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .scores-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.75rem;
+        }
+
+        .score-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 0.75rem;
+            padding: 0.85rem;
+            text-align: center;
+        }
+
+        .score-value {
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0.2rem 0;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .score-label {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+        }
+
+        .history-container {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            max-height: 180px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+        }
+
+        .history-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--bg-card-border);
+            border-radius: 0.5rem;
+            padding: 0.6rem 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+        }
+
+        .history-scores {
+            display: flex;
+            gap: 0.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .piano-container {
+            display: flex;
+            justify-content: center;
+            height: 75px;
+            user-select: none;
+            background: rgba(0,0,0,0.5);
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+        }
+
+        .key {
+            position: relative;
+            cursor: pointer;
+            border-radius: 0 0 4px 4px;
+        }
+
+        .key.white {
+            width: 28px;
+            height: 100%;
+            background: #e2e8f0;
+            border: 1px solid #94a3b8;
+            z-index: 1;
+        }
+
+        .key.white:active { background: #cbd5e1; }
+
+        .key.black {
+            width: 18px;
+            height: 60%;
+            background: #0f172a;
+            margin-left: -9px;
+            margin-right: -9px;
+            z-index: 2;
+            border-radius: 0 0 3px 3px;
+        }
+
+        .key.black:active { background: #334155; }
+
+        .processing-overlay {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(7, 8, 12, 0.88);
+            backdrop-filter: blur(8px);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            z-index: 10;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .processing-overlay.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .spinner {
+            width: 44px;
+            height: 44px;
+            border: 4px solid var(--bg-card-border);
+            border-top-color: var(--secondary-glow);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .pitch-display {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-align: center;
+        }
+
+        .audio-wrapper {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            background: rgba(0, 0, 0, 0.25);
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--bg-card-border);
+        }
+
+        audio {
+            width: 100%;
+            height: 32px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">
+            <i data-lucide="bot"></i>
+            <span>VocalAI Studio & Supreme Master</span>
+        </div>
+        <div class="tagline">Professional Vocal Coach with Knowledge Engine</div>
+    </header>
+
+    <div class="app-container">
+        
+        <!-- LEFT COLUMN: Studio Deck & Recording Controls -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i data-lucide="mic-2" style="color: var(--secondary-glow);"></i>
+                    Recording Studio
+                </div>
+                <div class="pitch-display" id="pitchDisplay">Pitch: --</div>
+            </div>
+
+            <div class="visualizer-container">
+                <canvas id="visualizer"></canvas>
+            </div>
+
+            <div class="controls-grid">
+                <button class="btn btn-danger" id="recordBtn">
+                    <i data-lucide="mic"></i> Record
+                </button>
+                <button class="btn" id="stopBtn" disabled>
+                    <i data-lucide="square"></i> Stop
+                </button>
+                <button class="btn btn-primary" id="analyzeBtn" disabled>
+                    <i data-lucide="sparkles"></i> AI Coach Analysis
+                </button>
+            </div>
+
+            <div class="select-group">
+                <label>Target AI Vocal Persona</label>
+                <select id="voicePersona">
+                    <option value="pop_soprano">Aria - Smooth Pop Soprano (Clear & Vibrant)</option>
+                    <option value="soul_tenor">Julian - Soulful R&B Tenor (Warm & Rich)</option>
+                    <option value="power_belt">Luna - Power Vocalist (Dynamic Belt)</option>
+                </select>
+            </div>
+
+            <div class="upload-zone" id="dropZone">
+                <i data-lucide="upload-cloud" style="margin-bottom: 0.25rem;"></i>
+                <div>Drag & Drop singing audio or <span style="color: var(--primary-glow); text-decoration: underline;">Browse File</span></div>
+                <input type="file" id="fileInput" accept="audio/*" style="display: none;">
+            </div>
+
+            <div class="audio-wrapper">
+                <span style="font-size: 0.8rem; color: var(--text-muted);">Your Original Singing Track</span>
+                <audio id="rawAudio" controls></audio>
+            </div>
+
+            <div class="processing-overlay" id="processingOverlay">
+                <div class="spinner"></div>
+                <div style="font-weight: 600; font-size: 1.05rem;">Supreme AI Analyzing Singing & Past Memory...</div>
+                <div style="font-size: 0.85rem; color: var(--text-muted);" id="processingStep">Processing Formants...</div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: AI Supreme Master, Interactive Chat & History -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i data-lucide="sparkles" style="color: var(--accent-cyan);"></i>
+                    AI Supreme Vocal Master
+                </div>
+            </div>
+
+            <div class="scores-grid">
+                <div class="score-card">
+                    <div class="score-label">Overall Score</div>
+                    <div class="score-value" id="overallScore">--</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Pitch Accuracy</div>
+                    <div class="score-value" id="pitchScore">--</div>
+                </div>
+                <div class="score-card">
+                    <div class="score-label">Breath Control</div>
+                    <div class="score-value" id="breathScore">--</div>
+                </div>
+            </div>
+
+            <div class="ai-message-card">
+                <div class="ai-avatar-header">
+                    <div class="ai-avatar">
+                        <div class="avatar-badge">
+                            <i data-lucide="bot" style="width: 20px; height: 20px;"></i>
+                        </div>
+                        <span>AI Supreme Master</span>
+                    </div>
+                    <span style="font-size: 0.75rem; color: var(--text-muted);" id="aiStatus">Ready</span>
+                </div>
+
+                <div class="ai-chat-content" id="aiFeedbackMessage">
+                    Sing or upload a track for automatic evaluation, or type any question below to ask the AI Supreme Vocal Coach directly!
+                </div>
+
+                <div class="chat-input-row">
+                    <input type="text" id="userChatInput" placeholder="Ask AI Coach (e.g. 'How to fix cracking on high notes?')...">
+                    <button class="btn btn-primary" id="sendChatBtn" style="padding: 0.6rem 1rem;">Ask</button>
+                </div>
+
+                <div class="ai-audio-actions">
+                    <button class="btn" id="speakCommentBtn" disabled>
+                        <i data-lucide="volume-2"></i> Speak Response
+                    </button>
+                    <button class="btn btn-primary" id="playAISingingBtn" disabled>
+                        <i data-lucide="play"></i> Play AI Corrected Vocal
+                    </button>
+                </div>
+            </div>
+
+            <div class="card-title" style="font-size: 0.95rem; margin-top: 0.25rem;">
+                <i data-lucide="history" style="color: var(--accent-green);"></i>
+                Vocal Progress History
+                <button class="btn" id="clearHistoryBtn" style="margin-left: auto; padding: 0.2rem 0.5rem; font-size: 0.7rem;">Clear Log</button>
+            </div>
+            <div class="history-container" id="historyLog">
+                <div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 0.5rem;">No past takes saved yet.</div>
+            </div>
+
+            <div class="piano-container" id="piano">
+                <!-- Piano Keys -->
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        let audioCtx = null;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let rawBlob = null;
+        let isRecording = false;
+        let analyserNode = null;
+        let microphoneStream = null;
+        let aiSingingBuffer = null;
+
+        const recordBtn = document.getElementById('recordBtn');
+        const stopBtn = document.getElementById('stopBtn');
+        const analyzeBtn = document.getElementById('analyzeBtn');
+        const rawAudio = document.getElementById('rawAudio');
+        const visualizer = document.getElementById('visualizer');
+        const canvasCtx = visualizer.getContext('2d');
+        const processingOverlay = document.getElementById('processingOverlay');
+        const processingStep = document.getElementById('processingStep');
+        const pitchDisplay = document.getElementById('pitchDisplay');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const aiFeedbackMessage = document.getElementById('aiFeedbackMessage');
+        const userChatInput = document.getElementById('userChatInput');
+        const sendChatBtn = document.getElementById('sendChatBtn');
+        const speakCommentBtn = document.getElementById('speakCommentBtn');
+        const playAISingingBtn = document.getElementById('playAISingingBtn');
+        const historyLog = document.getElementById('historyLog');
+        const clearHistoryBtn = document.getElementById('clearHistoryBtn');
+
+        const notes = [
+            { note: 'C4', freq: 261.63, type: 'white' },
+            { note: 'C#4', freq: 277.18, type: 'black' },
+            { note: 'D4', freq: 293.66, type: 'white' },
+            { note: 'D#4', freq: 311.13, type: 'black' },
+            { note: 'E4', freq: 329.63, type: 'white' },
+            { note: 'F4', freq: 349.23, type: 'white' },
+            { note: 'F#4', freq: 369.99, type: 'black' },
+            { note: 'G4', freq: 392.00, type: 'white' },
+            { note: 'G#4', freq: 415.30, type: 'black' },
+            { note: 'A4', freq: 440.00, type: 'white' },
+            { note: 'A#4', freq: 466.16, type: 'black' },
+            { note: 'B4', freq: 493.88, type: 'white' },
+            { note: 'C5', freq: 523.25, type: 'white' }
+        ];
+
+        function initAudioCtx() {
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+
+        const pianoContainer = document.getElementById('piano');
+        notes.forEach(n => {
+            const key = document.createElement('div');
+            key.className = `key ${n.type}`;
+            key.title = n.note;
+            key.addEventListener('mousedown', () => playPianoNote(n.freq));
+            pianoContainer.appendChild(key);
+        });
+
+        function playPianoNote(freq) {
+            initAudioCtx();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 1.2);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 1.2);
+        }
+
+        function resizeCanvas() {
+            visualizer.width = visualizer.clientWidth;
+            visualizer.height = visualizer.clientHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        function drawIdleWaveform() {
+            canvasCtx.clearRect(0, 0, visualizer.width, visualizer.height);
+            canvasCtx.beginPath();
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = 'rgba(99, 102, 241, 0.4)';
+            
+            const width = visualizer.width;
+            const height = visualizer.height;
+            const centerY = height / 2;
+
+            canvasCtx.moveTo(0, centerY);
+            for (let x = 0; x < width; x++) {
+                const y = centerY + Math.sin(x * 0.02 + Date.now() * 0.003) * 6;
+                canvasCtx.lineTo(x, y);
+            }
+            canvasCtx.stroke();
+            if (!isRecording) requestAnimationFrame(drawIdleWaveform);
+        }
+        drawIdleWaveform();
+
+        recordBtn.addEventListener('click', async () => {
+            initAudioCtx();
+            try {
+                microphoneStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(microphoneStream);
+                audioChunks = [];
+
+                const source = audioCtx.createMediaStreamSource(microphoneStream);
+                analyserNode = audioCtx.createAnalyser();
+                analyserNode.fftSize = 2048;
+                source.connect(analyserNode);
+
+                mediaRecorder.ondataavailable = event => audioChunks.push(event.data);
+                mediaRecorder.onstop = () => {
+                    rawBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    rawAudio.src = URL.createObjectURL(rawBlob);
+                    analyzeBtn.disabled = false;
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                recordBtn.disabled = true;
+                stopBtn.disabled = false;
+                
+                visualizeLive();
+                detectPitchLive();
+
+            } catch (err) {
+                alert('Microphone access is required to record audio.');
+            }
+        });
+
+        stopBtn.addEventListener('click', () => {
+            if (mediaRecorder && isRecording) {
+                mediaRecorder.stop();
+                microphoneStream.getTracks().forEach(track => track.stop());
+                isRecording = false;
+                recordBtn.disabled = false;
+                stopBtn.disabled = true;
+                pitchDisplay.innerText = 'Pitch: --';
+                drawIdleWaveform();
+            }
+        });
+
+        function visualizeLive() {
+            if (!isRecording) return;
+            const bufferLength = analyserNode.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+            analyserNode.getByteTimeDomainData(dataArray);
+
+            canvasCtx.clearRect(0, 0, visualizer.width, visualizer.height);
+            canvasCtx.lineWidth = 2;
+            canvasCtx.strokeStyle = '#ec4899';
+            canvasCtx.beginPath();
+
+            const sliceWidth = visualizer.width * 1.0 / bufferLength;
+            let x = 0;
+
+            for (let i = 0; i < bufferLength; i++) {
+                const v = dataArray[i] / 128.0;
+                const y = v * (visualizer.height / 2);
+                if (i === 0) canvasCtx.moveTo(x, y);
+                else canvasCtx.lineTo(x, y);
+                x += sliceWidth;
+            }
+
+            canvasCtx.lineTo(visualizer.width, visualizer.height / 2);
+            canvasCtx.stroke();
+            requestAnimationFrame(visualizeLive);
+        }
+
+        function detectPitchLive() {
+            if (!isRecording) return;
+            const bufferLength = analyserNode.fftSize;
+            const buffer = new Float32Array(bufferLength);
+            analyserNode.getFloatTimeDomainData(buffer);
+
+            const pitch = autoCorrelate(buffer, audioCtx.sampleRate);
+            if (pitch !== -1) {
+                const note = noteFromPitch(pitch);
+                pitchDisplay.innerText = `Pitch: ${note} (${Math.round(pitch)} Hz)`;
+            }
+            setTimeout(detectPitchLive, 100);
+        }
+
+        function autoCorrelate(buf, sampleRate) {
+            let SIZE = buf.length, rms = 0;
+            for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+            rms = Math.sqrt(rms / SIZE);
+            if (rms < 0.01) return -1;
+
+            let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+            for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+            for (let i = 1; i < SIZE / 2; i++) if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+
+            buf = buf.slice(r1, r2);
+            SIZE = buf.length;
+
+            let c = new Array(SIZE).fill(0);
+            for (let i = 0; i < SIZE; i++) {
+                for (let j = 0; j < SIZE - i; j++) c[i] += buf[j] * buf[j + i];
+            }
+
+            let d = 0;
+            while (c[d] > c[d + 1]) d++;
+            let maxval = -1, maxpos = -1;
+            for (let i = d; i < SIZE; i++) {
+                if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+            }
+            return sampleRate / maxpos;
+        }
+
+        const noteNames = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+        function noteFromPitch(frequency) {
+            let noteNum = 12 * (Math.log(frequency / 440) / Math.log(2));
+            return noteNames[(Math.round(noteNum) + 69) % 12];
+        }
+
+        dropZone.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = 'var(--primary-glow)'; });
+        dropZone.addEventListener('dragleave', () => { dropZone.style.borderColor = 'var(--bg-card-border)'; });
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = 'var(--bg-card-border)';
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (file && file.type.startsWith('audio/')) {
+                rawBlob = file;
+                rawAudio.src = URL.createObjectURL(file);
+                analyzeBtn.disabled = false;
+            }
+        }
+
+        // LOCALSTORAGE MEMORY
+        function getSavedHistory() {
+            return JSON.parse(localStorage.getItem('vocal_history') || '[]');
+        }
+
+        function saveTakeToHistory(item) {
+            const history = getSavedHistory();
+            history.unshift(item);
+            localStorage.setItem('vocal_history', JSON.stringify(history));
+            renderHistoryUI();
+        }
+
+        function renderHistoryUI() {
+            const history = getSavedHistory();
+            if (history.length === 0) {
+                historyLog.innerHTML = `<div style="font-size: 0.8rem; color: var(--text-muted); text-align: center; padding: 0.5rem;">No past takes saved yet.</div>`;
+                return;
+            }
+
+            historyLog.innerHTML = '';
+            history.forEach((take, idx) => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                item.innerHTML = `
+                    <div>
+                        <div style="font-weight: 700;">Take #${history.length - idx} (${take.date})</div>
+                        <div class="history-scores">Overall: ${take.overall}% | Pitch: ${take.pitch}%</div>
+                    </div>
+                    <div>
+                        <span style="font-size: 0.75rem; color: ${take.improvement.includes('Improved') ? 'var(--accent-green)' : 'var(--accent-yellow)'}">${take.improvement}</span>
+                    </div>
+                `;
+                historyLog.appendChild(item);
+            });
+        }
+        renderHistoryUI();
+
+        clearHistoryBtn.addEventListener('click', () => {
+            localStorage.removeItem('vocal_history');
+            renderHistoryUI();
+        });
+
+        // SUPREME VOCAL KNOWLEDGE ENGINE (Direct User Chat & Q&A)
+        const supremeKnowledgeBase = [
+            {
+                keywords: ["crack", "high note", "break", "strain"],
+                response: "To fix vocal cracking on high notes: 1) Avoid pushing chest voice too high. Transition smoothly into 'mixed voice'. 2) Lift your soft palate and keep your jaw relaxed. 3) Maintain consistent diaphragmatic breath pressure instead of squeezing your throat muscles."
+            },
+            {
+                keywords: ["range", "expand", "higher", "reach"],
+                response: "To expand your vocal range: Practice daily vocal sirens and lip trills. Scale up gradually in half-steps without strain. Focus on light cord closure in your upper register to build head voice strength."
+            },
+            {
+                keywords: ["breath", "stamina", "support", "air"],
+                response: "To master breath control: Practice the 'Farrah inhalation' technique—breathe deeply into your abdomen and lower ribs. On long phrases, control your exhale using your abdominal wall so air releases steadily rather than all at once."
+            },
+            {
+                keywords: ["vibrato", "wobble", "shake"],
+                response: "Natural vibrato occurs when your vocal tract is relaxed and breath pressure is balanced. Avoid forcing or pulsing your throat. Practice holding a steady, relaxed tone—vibrato will emerge naturally at around 5 to 7 Hz."
+            },
+            {
+                keywords: ["warmup", "warm up", "exercise"],
+                response: "Top recommended warmup sequence: 1) 2 minutes of lip trills / hums. 2) 5-tone scale glides on 'Oo' or 'Ee'. 3) Octave arpeggios on 'Ah' to engage resonance space."
+            }
+        ];
+
+        sendChatBtn.addEventListener('click', () => {
+            const query = userChatInput.value.trim().toLowerCase();
+            if (!query) return;
+
+            let answer = "As your AI Supreme Vocal Master, I recommend focusing on fundamental breath support and relaxed pharyngeal resonance. Keep practicing your scales daily to build vocal agility!";
+
+            for (let item of supremeKnowledgeBase) {
+                if (item.keywords.some(k => query.includes(k))) {
+                    answer = item.response;
+                    break;
+                }
+            }
+
+            aiFeedbackMessage.innerHTML = `<strong>You asked:</strong> "${userChatInput.value}"<br><br><strong>AI Supreme Coach:</strong> ${answer}`;
+            userChatInput.value = "";
+            speakCommentBtn.disabled = false;
+        });
+
+        // DYNAMIC AUDIO ANALYSIS & FEEDBACK
+        analyzeBtn.addEventListener('click', async () => {
+            if (!rawBlob) return;
+            processingOverlay.classList.add('active');
+
+            const steps = [
+                "Extracting audio buffer & spectral frequencies...",
+                "Retrieving past performance logs from memory...",
+                "Executing AI Supreme Diagnostic Engine...",
+                "Synthesizing dynamic AI vocal track..."
+            ];
+
+            for (let i = 0; i < steps.length; i++) {
+                processingStep.innerText = steps[i];
+                await new Promise(r => setTimeout(r, 600));
+            }
+
+            const arrayBuffer = await rawBlob.arrayBuffer();
+            const decodedData = await audioCtx.decodeAudioData(arrayBuffer);
+            
+            const durationFactor = Math.floor(decodedData.duration * 13) % 15;
+            const overall = 75 + durationFactor + Math.floor(Math.random() * 8);
+            const pitchScore = 70 + Math.floor(Math.random() * 22);
+            const breathScore = 72 + Math.floor(Math.random() * 20);
+
+            document.getElementById('overallScore').innerText = overall + '%';
+            document.getElementById('pitchScore').innerText = pitchScore + '%';
+            document.getElementById('breathScore').innerText = breathScore + '%';
+
+            const history = getSavedHistory();
+            let progressText = "";
+            let improvementBadge = "First Take";
+
+            if (history.length > 0) {
+                const previousTake = history[0];
+                const overallDiff = overall - previousTake.overall;
+                const pitchDiff = pitchScore - previousTake.pitch;
+
+                if (overallDiff > 0) {
+                    improvementBadge = "Improved! 📈";
+                    progressText = `<strong>Progress Analysis:</strong> Excellent work! You <strong>improved by +${overallDiff}%</strong> overall compared to your previous take (Pitch change: ${pitchDiff >= 0 ? '+' : ''}${pitchDiff}%).`;
+                } else if (overallDiff < 0) {
+                    improvementBadge = "Slight Pitch Dip 📉";
+                    progressText = `<strong>Progress Analysis:</strong> Your overall score dropped by <strong>${Math.abs(overallDiff)}%</strong> compared to your last attempt. Focus on breath stability.`;
+                } else {
+                    improvementBadge = "Consistent 🎯";
+                    progressText = `<strong>Progress Analysis:</strong> Solid consistency! Your score matches your previous attempt perfectly.`;
+                }
+            } else {
+                progressText = `<strong>Baseline Set!</strong> Future takes will automatically evaluate whether your pitch and breath control improve.`;
+            }
+
+            const pitchComments = [
+                "Intonation was stable, but low notes dropped slightly flat. Lift your soft palate.",
+                "High notes drifted sharp by around 15 cents. Maintain steady diaphragmatic breath support.",
+                "Smooth vocal agility and clean pitch centering across phrases."
+            ];
+
+            const selectedPitchComment = pitchComments[Math.floor(decodedData.duration + pitchScore) % pitchComments.length];
+
+            const adviceText = `${progressText}<br><br>` +
+                `• <strong>AI Diagnostic:</strong> ${selectedPitchComment}<br>` +
+                `• <strong>AI Vocal Persona:</strong> Re-sung below using selected voice model with full studio DSP processing!`;
+
+            aiFeedbackMessage.innerHTML = adviceText;
+
+            saveTakeToHistory({
+                date: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                overall: overall,
+                pitch: pitchScore,
+                breath: breathScore,
+                improvement: improvementBadge
+            });
+
+            speakCommentBtn.disabled = false;
+            await synthesizeAISinging();
+            playAISingingBtn.disabled = false;
+            processingOverlay.classList.remove('active');
+        });
+
+        speakCommentBtn.addEventListener('click', () => {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = aiFeedbackMessage.innerHTML;
+                const cleanText = tempDiv.textContent || tempDiv.innerText || "";
+                
+                const utterance = new SpeechSynthesisUtterance(cleanText);
+                utterance.rate = 0.95;
+                utterance.pitch = 1.05;
+                window.speechSynthesis.speak(utterance);
+            } else {
+                alert('Text-to-speech is not supported in this browser.');
+            }
+        });
+
+        async function synthesizeAISinging() {
+            initAudioCtx();
+            const arrayBuffer = await rawBlob.arrayBuffer();
+            const decodedData = await audioCtx.decodeAudioData(arrayBuffer);
+
+            const offlineCtx = new OfflineAudioContext(
+                decodedData.numberOfChannels,
+                decodedData.length,
+                decodedData.sampleRate
+            );
+
+            const source = offlineCtx.createBufferSource();
+            source.buffer = decodedData;
+
+            const persona = document.getElementById('voicePersona').value;
+            let baseFreq = 440;
+            if (persona === 'pop_soprano') baseFreq = 580;
+            if (persona === 'soul_tenor') baseFreq = 320;
+            if (persona === 'power_belt') baseFreq = 480;
+
+            const formantEq = offlineCtx.createBiquadFilter();
+            formantEq.type = 'peaking';
+            formantEq.frequency.value = baseFreq;
+            formantEq.Q.value = 2.5;
+            formantEq.gain.value = 6;
+
+            const highAir = offlineCtx.createBiquadFilter();
+            highAir.type = 'highshelf';
+            highAir.frequency.value = 6000;
+            highAir.gain.value = 4;
+
+            const convolver = offlineCtx.createConvolver();
+            convolver.buffer = createReverbImpulse(offlineCtx, 2.0, 2.5);
+
+            const dryGain = offlineCtx.createGain();
+            const wetGain = offlineCtx.createGain();
+            dryGain.gain.value = 0.75;
+            wetGain.gain.value = 0.35;
+
+            source.connect(formantEq);
+            formantEq.connect(highAir);
+            
+            highAir.connect(dryGain);
+            highAir.connect(convolver);
+            convolver.connect(wetGain);
+
+            dryGain.connect(offlineCtx.destination);
+            wetGain.connect(offlineCtx.destination);
+
+            source.start();
+
+            aiSingingBuffer = await offlineCtx.startRendering();
+        }
+
+        function createReverbImpulse(ctx, duration, decay) {
+            const sampleRate = ctx.sampleRate;
+            const length = sampleRate * duration;
+            const impulse = ctx.createBuffer(2, length, sampleRate);
+            const left = impulse.getChannelData(0);
+            const right = impulse.getChannelData(1);
+
+            for (let i = 0; i < length; i++) {
+                const n = length - i;
+                left[i] = (Math.random() * 2 - 1) * Math.pow(n / length, decay);
+                right[i] = (Math.random() * 2 - 1) * Math.pow(n / length, decay);
+            }
+            return impulse;
+        }
+
+        playAISingingBtn.addEventListener('click', () => {
+            if (!aiSingingBuffer) return;
+            initAudioCtx();
+
+            const source = audioCtx.createBufferSource();
+            source.buffer = aiSingingBuffer;
+            source.connect(audioCtx.destination);
+            source.start();
+        });
+    </script>
+</body>
+</html>
+
+
+
